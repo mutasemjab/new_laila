@@ -19,83 +19,85 @@ use function GuzzleHttp\Promise\queue;
 class DayController extends Controller
 {
 
-    public function index(Request $request)
+     /**
+     * Get cumulative time spent by users in all rooms except main room
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCumulativeRoomTime(Request $request)
     {
         if (!auth()->user()->can('day-table')) { abort(403); }
-
-        $avgTime = AttendanceLogHistory::calculateAveragePresenceHistory()['avg'];
-        $sumTime = AttendanceLogHistory::calculateAveragePresenceHistory()['sum'];
-
-        // Get total number of registered users
-        $totalUsers = User::where('activate', 1)->count();
-
-        // Get total check-ins across all rooms
-        $totalCheckIns = User::whereHas('attendanceLogHistories')->count();
-
-        $users =  User::with(['latestAttendanceHistories'])->whereHas('latestAttendanceHistories')
-        ->paginate(PAGINATION_COUNT);
-
-        $attendanceSummary = $this->attendanceSummary($request);
-
-        $attendanceSummary = json_decode($attendanceSummary, true);
-
-        return view('admin.days.days', compact(
-            'totalUsers',
-            'avgTime',
-            'sumTime',
-            'totalCheckIns',
-            'users',
-            'attendanceSummary',
-        ));
-
-    }
-
-    public function getDaysUsers(Request $request)
-    {
-        $users   = User::with(['latestAttendanceHistories' => function($query) use ($request) {
-           if($request->room_id && $request->room_id  != 'all') $query->where('room_id', $request->room_id);
-           if($request->day_id  && $request->day_id  != 'all') $query->where('day_no', $request->day_id);
-        }])
-        ->where(function ($query) use($request){
-            if($request->barcode) $query->where('barcode',$request->barcode);
-            if($request->category && $request->category != 'all') $query->where('category',$request->category);
-            if($request->name) {
-                $query->where('first_name',$request->name);
+        
+        // Get all users
+        $users = User::whereHas('roomAttendanceMetrics')->get();
+        
+        // For each user, calculate cumulative time in non-main rooms
+        $userData = [];
+        foreach ($users as $user) {
+            // Get all room metrics for this user from all days (excluding main room)
+            $roomMetrics = RoomAttendanceMetric::where('user_id', $user->id)
+                ->whereHas('room', function($query) {
+                    $query->where('is_main', false);
+                })
+                ->with(['room', 'day'])
+                ->get();
+            
+            // Initialize user data
+            $userData[$user->id] = [
+                'user' => $user,
+                'total_seconds' => 0,
+                'daily_breakdown' => [],
+                'room_breakdown' => []
+            ];
+            
+            // Calculate totals
+            foreach ($roomMetrics as $metric) {
+                // Add to total seconds
+                $userData[$user->id]['total_seconds'] += $metric->time_spent_seconds;
+                
+                // Add to daily breakdown
+                if (!isset($userData[$user->id]['daily_breakdown'][$metric->day_id])) {
+                    $userData[$user->id]['daily_breakdown'][$metric->day_id] = 0;
+                }
+                $userData[$user->id]['daily_breakdown'][$metric->day_id] += $metric->time_spent_seconds;
+                
+                // Add to room breakdown
+                if (!isset($userData[$user->id]['room_breakdown'][$metric->room_id])) {
+                    $userData[$user->id]['room_breakdown'][$metric->room_id] = [
+                        'name' => $metric->room->name,
+                        'seconds' => 0
+                    ];
+                }
+                $userData[$user->id]['room_breakdown'][$metric->room_id]['seconds'] += $metric->time_spent_seconds;
             }
-        })
-        ->whereHas('latestAttendanceHistories',function ($query) use($request){
-            if($request->room_id && $request->room_id  != 'all') $query->where('room_id', $request->room_id);
-            if($request->day_id  && $request->day_id  != 'all') $query->where('day_no', $request->day_id);
-            if($request->status  && $request->status != 'all') $query->where('type',$request->status);
-        })
-        ->get();
-
-        return view('admin.days.attandance-users', compact(
-            'users',
-        ));
+            
+            // Convert daily breakdown to human-readable format
+            foreach ($userData[$user->id]['daily_breakdown'] as $dayId => $seconds) {
+                $hours = floor($seconds / 3600);
+                $minutes = floor(($seconds % 3600) / 60);
+                $userData[$user->id]['daily_breakdown'][$dayId] = sprintf('%d hours, %d minutes', $hours, $minutes);
+            }
+            
+            // Convert room breakdown to human-readable format
+            foreach ($userData[$user->id]['room_breakdown'] as $roomId => &$roomData) {
+                $hours = floor($roomData['seconds'] / 3600);
+                $minutes = floor(($roomData['seconds'] % 3600) / 60);
+                $roomData['time'] = sprintf('%d hours, %d minutes', $hours, $minutes);
+            }
+            
+            // Calculate total hours and minutes
+            $hours = floor($userData[$user->id]['total_seconds'] / 3600);
+            $minutes = floor(($userData[$user->id]['total_seconds'] % 3600) / 60);
+            $userData[$user->id]['total_time'] = sprintf('%d hours, %d minutes', $hours, $minutes);
+        }
+        
+        // Get days for display
+        $days = Day::orderBy('id')->get();
+        
+        return view('admin.days.days', compact('userData', 'days'));
     }
 
-    public function attendanceSummary($request) {
-        $attendanceSummary = User::where('activate', 1)
-        ->whereHas('attendanceLogHistories', function($q) use($request){
-            $q->where('type', 'in');
-            if($request->room_id && $request->room_id  != 'all') $q->where('room_id', $request->room_id);
-            if($request->day_id && $request->day_id  != 'all') $q->where('day_no', $request->day_id);
-        })
-        ->selectRaw("
-            JSON_OBJECT(
-                '1', COUNT(CASE WHEN category = 1 THEN 1 END),
-                '2', COUNT(CASE WHEN category = 2 THEN 1 END),
-                '3', COUNT(CASE WHEN category = 3 THEN 1 END),
-                '4', COUNT(CASE WHEN category = 4 THEN 1 END),
-                '5', COUNT(CASE WHEN category = 5 THEN 1 END),
-                '6', COUNT(CASE WHEN category = 6 THEN 1 END)
-            ) as counts
-        ")
-        ->first()
-        ->counts;
-        return $attendanceSummary;
-    }
 
     public function Close()
     {
@@ -284,7 +286,7 @@ class DayController extends Controller
     {
         // جلب السجلات للمكان واليوم المحدد
         $logs = AttendanceLogHistory::with('user')->whereHas('user',function ($q)use($request) {
-            if($request->name)     $q->where('first_name',$request->name);
+            if($request->name)     $q->where('name',$request->name);
             if($request->barcode)  $q->where('barcode',$request->barcode);
             if($request->category && $request->category != 'all'){
                 $q->where('category',$request->category);

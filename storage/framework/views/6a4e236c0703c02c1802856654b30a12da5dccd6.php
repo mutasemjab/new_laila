@@ -1,25 +1,26 @@
-@extends('layouts.admin')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2>{{ $multipleUsers ? 'All Users Attendance Logs' : 'Attendance Logs for ' . $user->name }}</h2>
+                    <h2><?php echo e($multipleUsers ? 'All Users Attendance Logs' : 'Attendance Logs for ' . $user->name); ?></h2>
                 </div>
 
                 <div class="card-body">
-                    @if(session('status'))
+                    <?php if(session('status')): ?>
                         <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+                            <?php echo e(session('status')); ?>
 
-                    @foreach($userData as $data)
-                        @if($multipleUsers)
-                            <h3 class="mb-3">{{ $data['user']->name }}</h3>
-                        @endif
+                        </div>
+                    <?php endif; ?>
+
+                    <?php $__currentLoopData = $userData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $data): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php if($multipleUsers): ?>
+                            <h3 class="mb-3"><?php echo e($data['user']->name); ?></h3>
+                        <?php endif; ?>
 
                         <!-- Room Summary Cards -->
                         <div class="card mb-4">
@@ -28,15 +29,16 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    @foreach($rooms as $room)
+                                    <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="col-md-3 mb-3">
-                                            <div class="card {{ $room->is_main ? 'border-primary' : '' }}">
-                                                <div class="card-header {{ $room->is_main ? 'bg-primary text-white' : 'bg-light' }}">
-                                                    {{ $room->name }}
+                                            <div class="card <?php echo e($room->is_main ? 'border-primary' : ''); ?>">
+                                                <div class="card-header <?php echo e($room->is_main ? 'bg-primary text-white' : 'bg-light'); ?>">
+                                                    <?php echo e($room->name); ?>
+
                                                 </div>
                                                 <div class="card-body">
                                                     <h5 class="card-title">
-                                                        @php
+                                                        <?php
                                                         $isCurrentlyInRoom = false;
                                                         foreach($data['logs'] as $log) {
                                                             if ($log->room_id == $room->id && $log->type == 'in' && 
@@ -45,20 +47,20 @@
                                                                 $isCurrentlyInRoom = true;
                                                             }
                                                         }
-                                                    @endphp
+                                                    ?>
                                                     
-                                                    @if(isset($data['formattedTotalTime'][$room->id]))
-                                                        <span class="badge bg-success">{{ $data['formattedTotalTime'][$room->id] }}</span>
-                                                    @elseif($isCurrentlyInRoom)
+                                                    <?php if(isset($data['formattedTotalTime'][$room->id])): ?>
+                                                        <span class="badge bg-success"><?php echo e($data['formattedTotalTime'][$room->id]); ?></span>
+                                                    <?php elseif($isCurrentlyInRoom): ?>
                                                         <span class="badge bg-primary">Currently In</span>
-                                                    @else
+                                                    <?php else: ?>
                                                         <span class="badge bg-secondary">No visits</span>
-                                                    @endif
+                                                    <?php endif; ?>
                                                     </h5>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
                             </div>
                         </div>
@@ -69,10 +71,10 @@
                                 <h4>Detailed Attendance by Day</h4>
                             </div>
                             <div class="card-body p-0">
-                                @forelse($data['logsByDay'] as $dayNo => $logs)
+                                <?php $__empty_1 = true; $__currentLoopData = $data['logsByDay']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dayNo => $logs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <div class="day-section mb-4">
                                         <div class="day-header bg-light p-2 border">
-                                            <h5 class="mb-0">Day {{ $dayNo }}</h5>
+                                            <h5 class="mb-0">Day <?php echo e($dayNo); ?></h5>
                                         </div>
                                         <div class="table-responsive">
                                             <table class="table table-striped table-bordered mb-0">
@@ -85,13 +87,13 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @php
+                                                    <?php
                                                         $roomEntryTimes = [];
                                                         $rowClass = '';
-                                                    @endphp
+                                                    ?>
                                                     
-                                                    @foreach($logs as $log)
-                                                        @php
+                                                    <?php $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <?php
                                                             $roomName = $rooms->where('id', $log->room_id)->first()->name;
                                                             $isHistory = $log instanceof App\Models\AttendanceLogHistory;
                                                             $time = \Carbon\Carbon::parse($log->time);
@@ -114,43 +116,45 @@
                                                                      ->where('type', 'out')
                                                                      ->where('time', '>', $log->time)
                                                                      ->count();
-                                                        @endphp
+                                                        ?>
                                                         
-                                                        <tr class="{{ $rowClass }} {{ $isLastEntry ? 'fw-bold' : '' }}">
-                                                            <td class="text-center">{{ $time->format('H:i:s') }}</td>
+                                                        <tr class="<?php echo e($rowClass); ?> <?php echo e($isLastEntry ? 'fw-bold' : ''); ?>">
+                                                            <td class="text-center"><?php echo e($time->format('H:i:s')); ?></td>
                                                             <td class="text-center">
-                                                                <span class="badge bg-{{ $rooms->where('id', $log->room_id)->first()->is_main ? 'primary' : 'info' }} fs-6">
-                                                                    {{ $roomName }}
+                                                                <span class="badge bg-<?php echo e($rooms->where('id', $log->room_id)->first()->is_main ? 'primary' : 'info'); ?> fs-6">
+                                                                    <?php echo e($roomName); ?>
+
                                                                 </span>
                                                             </td>
                                                           
                                                             <td class="text-center">
-                                                                <span class="badge bg-{{ $isHistory ? 'warning' : 'info' }} fs-6">
-                                                                    {{ $isHistory ? 'Historical' : 'Current' }}
+                                                                <span class="badge bg-<?php echo e($isHistory ? 'warning' : 'info'); ?> fs-6">
+                                                                    <?php echo e($isHistory ? 'Historical' : 'Current'); ?>
+
                                                                 </span>
                                                             </td>
                                                             <td class="text-center">
-                                                                @if($duration && $log->type === 'out')
+                                                                <?php if($duration && $log->type === 'out'): ?>
                                                                     <span class="badge bg-dark fs-6">
-                                                                    {{ sprintf('%02d:%02d:%02d', 
+                                                                    <?php echo e(sprintf('%02d:%02d:%02d', 
                                                                         $duration->h + ($duration->days * 24), 
                                                                         $duration->i, 
-                                                                        $duration->s) 
-                                                                    }}
+                                                                        $duration->s)); ?>
+
                                                                     </span>
-                                                                @else
+                                                                <?php else: ?>
                                                                     -
-                                                                @endif
+                                                                <?php endif; ?>
                                                             </td>
                                                         </tr>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-                                @empty
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <div class="alert alert-warning m-3">No attendance logs found for this user.</div>
-                                @endforelse
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -161,13 +165,13 @@
                             </div>
                             <div class="card-body">
                                 <div class="timeline">
-                                    @php
+                                    <?php
                                         $prevDay = null;
                                         $roomStatus = [];
-                                    @endphp
+                                    ?>
                                     
-                                    @foreach($data['logs'] as $index => $log)
-                                        @php
+                                    <?php $__currentLoopData = $data['logs']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
                                             $time = \Carbon\Carbon::parse($log->time);
                                             $roomName = $rooms->where('id', $log->room_id)->first()->name;
                                             $isHistory = $log instanceof App\Models\AttendanceLogHistory;
@@ -182,46 +186,48 @@
                                                 </div>';
                                                 $prevDay = $log->day_no;
                                             }
-                                        @endphp
+                                        ?>
                                         
                                         <div class="timeline-item">
-                                            <div class="timeline-marker {{ $log->type === 'in' ? 'bg-success' : 'bg-danger' }}"></div>
+                                            <div class="timeline-marker <?php echo e($log->type === 'in' ? 'bg-success' : 'bg-danger'); ?>"></div>
                                             <div class="timeline-content">
-                                                <p class="timeline-date mb-0">{{ $time->format('H:i:s') }}</p>
-                                                <h5>{{ ucfirst($log->type) }} {{ $roomName }}</h5>
+                                                <p class="timeline-date mb-0"><?php echo e($time->format('H:i:s')); ?></p>
+                                                <h5><?php echo e(ucfirst($log->type)); ?> <?php echo e($roomName); ?></h5>
                                                 <p class="timeline-text">
-                                                    <span class="badge bg-{{ $isHistory ? 'warning' : 'info' }}">
-                                                        {{ $isHistory ? 'Historical Record' : 'Current Record' }}
+                                                    <span class="badge bg-<?php echo e($isHistory ? 'warning' : 'info'); ?>">
+                                                        <?php echo e($isHistory ? 'Historical Record' : 'Current Record'); ?>
+
                                                     </span>
                                                     
-                                                    @if($log->type === 'in')
-                                                        @php $roomStatus[$log->room_id] = $time; @endphp
-                                                    @elseif(isset($roomStatus[$log->room_id]))
-                                                        @php
+                                                    <?php if($log->type === 'in'): ?>
+                                                        <?php $roomStatus[$log->room_id] = $time; ?>
+                                                    <?php elseif(isset($roomStatus[$log->room_id])): ?>
+                                                        <?php
                                                             $entryTime = $roomStatus[$log->room_id];
                                                             $duration = $time->diff($entryTime);
                                                             $durationStr = sprintf('%02d:%02d:%02d', 
                                                                 $duration->h + ($duration->days * 24), 
                                                                 $duration->i, 
                                                                 $duration->s);
-                                                        @endphp
+                                                        ?>
                                                         <span class="badge bg-info ms-2">
-                                                            Duration: {{ $durationStr }}
+                                                            Duration: <?php echo e($durationStr); ?>
+
                                                         </span>
-                                                        @php unset($roomStatus[$log->room_id]); @endphp
-                                                    @endif
+                                                        <?php unset($roomStatus[$log->room_id]); ?>
+                                                    <?php endif; ?>
                                                 </p>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
                             </div>
                         </div>
                         
-                        @if($multipleUsers)
+                        <?php if($multipleUsers): ?>
                             <hr class="my-5">
-                        @endif
-                    @endforeach
+                        <?php endif; ?>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
@@ -290,4 +296,5 @@
         border: 1px solid #dee2e6;
         transition
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\laila\resources\views/admin/users/showLog.blade.php ENDPATH**/ ?>

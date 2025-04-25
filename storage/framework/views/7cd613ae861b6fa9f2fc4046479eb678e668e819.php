@@ -1,11 +1,11 @@
-@extends('layouts.admin')
-@section('title')
-{{ $name }}
-@endsection
 
-@section('css')
+<?php $__env->startSection('title'); ?>
+الرئيسية
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('css'); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <style>
     .rooms-container {
         padding: 25px;
@@ -16,7 +16,7 @@
 
     .rooms-grid {
         display: grid;
-        /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 25px;
         margin-top: 20px;
     }
@@ -420,28 +420,31 @@
         100% { transform: rotate(360deg); }
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('contentheaderlink')
-<a href="{{ route('admin.dashboard') }}">{{ __('messages.Home') }} </a>
-@endsection
+<?php $__env->startSection('contentheaderlink'); ?>
+<a href="<?php echo e(route('admin.dashboard')); ?>"> الرئيسية </a>
+<?php $__env->stopSection(); ?>
 
-@section('contentheaderactive')
-<p> {{ $name }} </p>
-@endsection
+<?php $__env->startSection('contentheaderactive'); ?>
+عرض الغرف
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="rooms-container">
     <div class="dashboard-header">
         <div class="dashboard-title">
             <i class="fas fa-door-open"></i>
-            <h1>{{ $name }}</h1>
+            <h1><?php echo e(__('messages.rooms')); ?></h1>
         </div>
         <div class="dashboard-filters">
             <button class="refresh-stats" id="refreshStats">
                 <i class="fas fa-sync-alt"></i>
                 تحديث البيانات
             </button>
+            <button class="filter-btn active" data-filter="all">جميع الغرف</button>
+            <button class="filter-btn" data-filter="active">الغرف النشطة</button>
+            <button class="filter-btn" data-filter="empty">الغرف الفارغة</button>
         </div>
     </div>
 
@@ -452,37 +455,47 @@
             </div>
             <div class="stat-content">
                 <h3>إجمالي الحضور الحالي</h3>
-                <p id="total-attendance">{{ $totalActiveUsers }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon red">
-                <i class="fas fa-sign-out"></i>
-            </div>
-            <div class="stat-content">
-                <h3>اجمالي الخارجين</h3>
-                <p id="check-out-users">{{ $totalCheckIns - $totalActiveUsers }}</p>
+                <p id="total-attendance"><?php echo e($totalActiveUsers); ?></p>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon green">
+                <div class="stat-icon green">
+                    <i class="fas fa-door-open"></i>
+                </div>
+            </div>
+            <div class="stat-content">
+                <h3>الغرف النشطة</h3>
+                <p id="active-rooms"><?php echo e($activeRooms); ?></p>
+            </div>
+        </div>
+       
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>إجمالي المستخدمين</h3>
+                <p id="total-users"><?php echo e($totalUsers); ?></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red">
                 <i class="fas fa-sign-in-alt"></i>
             </div>
             <div class="stat-content">
                 <h3>إجمالي عمليات التسجيل</h3>
-                <p id="total-check-ins">{{ $totalCheckIns }}</p>
+                <p id="total-check-ins"><?php echo e($totalCheckIns); ?></p>
             </div>
         </div>
     </div>
 
     <div class="rooms-grid">
         <!-- Room Card Template - Will be populated dynamically -->
-        @foreach($rooms as $room)
-        <!-- Room Card with Fixed Counter -->
-        <div class="room-card" data-room-id="{{ $room->id }}" data-status="{{ $room->current_occupancy > 0 ? 'active' : 'empty' }}">
+        <?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="room-card" data-room-id="<?php echo e($room->id); ?>" data-status="<?php echo e($room->current_occupancy > 0 ? 'active' : 'empty'); ?>">
             <div class="room-header">
-                <h3>{{ $room->name }}</h3>
+                <h3><?php echo e($room->name); ?></h3>
                 <div class="room-icon">
                     <i class="fas fa-door-open"></i>
                 </div>
@@ -490,107 +503,16 @@
             <div class="room-details">
                 <div class="room-stat">
                     <span class="room-stat-label">عدد الحاضرين</span>
-                    <span class="room-stat-value">{{ $room->current_occupancy }}</span>
+                    <span class="room-stat-value"><?php echo e($room->current_occupancy); ?></span>
                 </div>
                 <div class="room-stat">
                     <span class="room-stat-label">آخر تسجيل دخول</span>
-                    <span class="room-stat-value last-check-in">{{ $room->last_check_in ? Carbon\Carbon::parse($room->last_check_in)->diffForHumans() : 'لا يوجد' }}</span>
+                    <span class="room-stat-value last-check-in"><?php echo e($room->last_check_in ? Carbon\Carbon::parse($room->last_check_in)->diffForHumans() : 'لا يوجد'); ?></span>
                 </div>
             </div>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
-
-    <div class="row justify-content-center pt-5">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h4 >Users</h4>
-                        <a href="javascript:void(0)"  id='update-users'></a>
-                    </div>
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>
-                                    ID
-                                    <div class="col-12 p-0 pt-3">#</div>
-                                </th>
-                                <th>Name <input id='attandance-users-name' class='attandance-users-search form-control rounded mt-1' type="text"></th>
-                                <th>
-                                    Status
-                                    <select name="status" id='attandance-users-status' class='attandance-users-search form-control rounded mt-1'>
-                                        <option value="all">{{ __('messages.Select') }}</option>
-                                        <option value="in">{{ __('messages.IN') }}</option>
-                                        <option value="out">{{ __('messages.Out') }}</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    Category
-                                    <select name="category" id='attandance-users-category' class='attandance-users-search form-control rounded mt-1'>
-                                        <option value="all">{{ __('messages.Select') }}</option>
-                                        <option value="1">{{ __('messages.Speaker') }}</option>
-                                        <option value="2">{{ __('messages.Participant') }}</option>
-                                        <option value="3">{{ __('messages.Exhibitor') }}</option>
-                                        <option value="4">{{ __('messages.Committee') }}</option>
-                                        <option value="5">{{ __('messages.Press') }}</option>
-                                        <option value="6">{{ __('messages.Other') }}</option>
-                                    </select>
-                                </th>
-                                <!-- <th>Email <input id='attandance-users-email' class='attandance-users-search form-control rounded mt-1' type="text"></th> -->
-                                <th>Barcode <input id='attandance-users-barcode' class='attandance-users-search form-control rounded mt-1' type="text"></th>
-                                <th>عدد دقائق الحضور  <i class="fa fa-clock text-success"></i> </th>
-                                <th>إجمالي الحضور  <i class="fa fa-clock text-success"></i> </th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id='attandance-users'>
-                        @if(isset($users) && $users->count())
-                            @foreach ($users as $user)
-                                <tr>
-                                    <td>{{ $user->id }}</td>
-                                    <td>{{  $user->name }}</td>
-                                    <td>
-                                        @php
-                                            // Get the most recent attendance log for this specific room
-                                            $latestRoomLog = $user->attendanceLogs
-                                                ->where('room_id', $room_id)
-                                                ->sortByDesc('time')
-                                                ->first();
-                                        @endphp
-                                        
-                                        @if($latestRoomLog && $latestRoomLog->type == 'in')
-                                            In <i class="fas fa-sign-in-alt text-success"></i>
-                                        @else
-                                            <i class="fas fa-sign-out text-danger"></i> Out
-                                        @endif
-                                    </td>
-                                    <td>{!! $user->categoryLabel(0) !!}</td>
-                                    <td>{{ $user->barcode }}</td>
-                                    <td>{!! $user->calculateAveragePresence($room_id)['avg'] !!}</td>
-                                    <td>{!! $user->calculateAveragePresence($room_id)['sum'] !!}</td>
-                                    <td>
-                                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm btn-info">View</a>
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="{{ route('user-time.show', $user->id) }}" class="btn btn-sm btn-secondary">Attendance</a>
-
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                        </tbody>
-                    </table>
-                    @if(isset($users) && $users->count()) {{ $users->links() }} @endif
-                </div>
-
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <!-- Scanner Modal -->
@@ -619,13 +541,10 @@
     <div class="toast-message">تم تسجيل الدخول بنجاح</div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
 <script>
-
-var room_id = '{{$room_id}}';
-
 document.addEventListener('DOMContentLoaded', function() {
     const rooms = document.querySelectorAll('.room-card');
     const modal = document.getElementById('scannerModal');
@@ -637,12 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const toast = document.getElementById('toast');
     const filterBtns = document.querySelectorAll('.filter-btn');
     const refreshStats = document.getElementById('refreshStats');
-    const updateUsers = document.getElementById('update-users');
 
-    const checkIns = document.getElementById('total-check-ins');
-    const attendance = document.getElementById('total-attendance');
-    const avgTime  = document.getElementById('avg-time');
-    const checkOuts = document.getElementById('check-out-users');
     let currentRoomId = null;
 
     // Helper function to get the CSRF token
@@ -691,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scanStatus.textContent = 'جاري التحقق من الباركود...';
 
         // Make a validation request
-        return fetch('{{ route("validate.barcode") }}', {
+        return fetch('<?php echo e(route("validate.barcode")); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -736,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('{{ route("scan.barcode") }}', {
+        fetch('<?php echo e(route("scan.barcode")); ?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -791,111 +705,74 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Update room stats
+    function updateRoomStats(roomId, occupancy, lastCheckIn) {
+        const roomCard = document.querySelector(`.room-card[data-room-id="${roomId}"]`);
+        if (roomCard) {
+            const occupancyElement = roomCard.querySelector('.room-stat-value');
+            if (occupancyElement) {
+                occupancyElement.textContent = occupancy;
+            }
 
-    function fetchAttandanceUsersToRoom(update_users = null) {
+            // Update last check-in time if provided
+            if (lastCheckIn) {
+                const lastCheckInElement = roomCard.querySelector('.last-check-in');
+                if (lastCheckInElement) {
+                    lastCheckInElement.textContent = lastCheckIn;
+                }
+            }
 
-        var status   = document.getElementById('attandance-users-status').value;
-        var category = document.getElementById('attandance-users-category').value;
-        var barcode  = document.getElementById('attandance-users-barcode').value;
-        var name     = document.getElementById('attandance-users-name').value;
+            // Update room status for filtering
+            roomCard.setAttribute('data-status', occupancy > 0 ? 'active' : 'empty');
+        }
+    }
 
-        fetch('{{ route("room.get.users",$room_id) }}', {
-            method: 'POST',
+    // Fetch and update all statistics from the server
+    function fetchAndUpdateStats() {
+        fetch('<?php echo e(route("room.statistics")); ?>', {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': getCSRFToken()
-            },
-            body: JSON.stringify({
-                barcode: barcode.trim(),
-                status: status,
-                category: category,
-                name: name,
-            })
+            }
         })
-        .then(response => response.text()) // Get the response as text
-        .then(response => {
-            if (response) {
-                document.getElementById('attandance-users').innerHTML = response;
+        .then(response => response.json())
+        .then(data => {
+            // Update dashboard stats
+            document.getElementById('total-attendance').textContent = data.totalActiveUsers;
+            document.getElementById('active-rooms').textContent = data.activeRooms;
+            document.getElementById('avg-time').textContent = data.avgTime;
+            document.getElementById('total-users').textContent = data.totalUsers;
+            document.getElementById('total-check-ins').textContent = data.totalCheckIns;
+
+            // Update each room's stats if provided
+            if (data.rooms) {
+                data.rooms.forEach(roomData => {
+                    const roomCard = document.querySelector(`.room-card[data-room-id="${roomData.id}"]`);
+                    if (roomCard) {
+                        // Update occupancy
+                        const occupancyEl = roomCard.querySelector('.room-stat-value');
+                        if (occupancyEl) {
+                            occupancyEl.textContent = roomData.current_occupancy;
+                        }
+
+                        // Update last check-in
+                        const lastCheckInEl = roomCard.querySelector('.last-check-in');
+                        if (lastCheckInEl) {
+                            lastCheckInEl.textContent = roomData.last_check_in_human || 'لا يوجد';
+                        }
+
+                        // Update status for filtering
+                        roomCard.setAttribute('data-status',
+                            roomData.current_occupancy > 0 ? 'active' : 'empty');
+                    }
+                });
             }
         })
         .catch(error => {
             console.error('Error fetching statistics:', error);
         });
     }
-
-    function fetchAndUpdateStats() {
-    fetch('{{ route("room.get.statistics",$room_id) }}', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': getCSRFToken()
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Update dashboard stats
-        checkIns.textContent = data.totalCheckIns;
-        attendance.textContent = data.totalActiveUsers;
-        
-        // Make sure we never show negative numbers for checked out users
-        const checkOutCount = Math.max(0, parseInt(data.totalCheckIns) - parseInt(data.totalActiveUsers));
-        checkOuts.textContent = checkOutCount;
-        
-        if (avgTime) {
-            avgTime.textContent = data.avgTime;
-        }
-
-        // Update each room's stats if provided
-        if (data.rooms) {
-            data.rooms.forEach(roomData => {
-                const roomCard = document.querySelector(`.room-card[data-room-id="${roomData.id}"]`);
-                if (roomCard) {
-                    // Update occupancy - ensure non-negative value
-                    const occupancyEl = roomCard.querySelector('.room-stat-value');
-                    if (occupancyEl) {
-                        occupancyEl.textContent = Math.max(0, roomData.current_occupancy);
-                    }
-
-                    // Update last check-in
-                    const lastCheckInEl = roomCard.querySelector('.last-check-in');
-                    if (lastCheckInEl) {
-                        lastCheckInEl.textContent = roomData.last_check_in_human || 'لا يوجد';
-                    }
-
-                    // Update status for filtering
-                    roomCard.setAttribute('data-status',
-                        roomData.current_occupancy > 0 ? 'active' : 'empty');
-                }
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching statistics:', error);
-    });
-}
-
-// Update room stats function (ensuring non-negative values)
-function updateRoomStats(roomId, occupancy, lastCheckIn) {
-    const roomCard = document.querySelector(`.room-card[data-room-id="${roomId}"]`);
-    if (roomCard) {
-        const occupancyElement = roomCard.querySelector('.room-stat-value');
-        if (occupancyElement) {
-            // Ensure occupancy is never negative
-            occupancyElement.textContent = Math.max(0, occupancy);
-        }
-
-        // Update last check-in time if provided
-        if (lastCheckIn) {
-            const lastCheckInElement = roomCard.querySelector('.last-check-in');
-            if (lastCheckInElement) {
-                lastCheckInElement.textContent = lastCheckIn;
-            }
-        }
-
-        // Update room status for filtering
-        roomCard.setAttribute('data-status', occupancy > 0 ? 'active' : 'empty');
-    }
-}
 
     // Refresh all stats (for the refresh button)
     function refreshAllStats() {
@@ -948,11 +825,6 @@ function updateRoomStats(roomId, occupancy, lastCheckIn) {
         barcodeInput.value = '';
     });
 
-    // up date users on click
-    updateUsers.addEventListener('click', function() {
-        fetchAttandanceUsersToRoom();
-    });
-
     // Scan button click
     scanBtn.addEventListener('click', function() {
         const barcode = barcodeInput.value;
@@ -976,18 +848,19 @@ function updateRoomStats(roomId, occupancy, lastCheckIn) {
         // });
     });
 
-    barcodeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const barcode = this.value;
-            if (!barcode || barcode.trim() === '') {
-                scanStatus.className = 'scan-status error';
-                scanStatus.textContent = 'الرجاء إدخال باركود صحيح';
-                return;
-            }
-
-            processBarcode(barcode);
+    // Handle Enter key press in input field
+barcodeInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const barcode = this.value;
+        if (!barcode || barcode.trim() === '') {
+            scanStatus.className = 'scan-status error';
+            scanStatus.textContent = 'الرجاء إدخال باركود صحيح';
+            return;
         }
-    });
+
+        processBarcode(barcode);
+    }
+});
 
     // Add refresh button event listener
     refreshStats.addEventListener('click', refreshAllStats);
@@ -996,4 +869,6 @@ function updateRoomStats(roomId, occupancy, lastCheckIn) {
     // setInterval(fetchAndUpdateStats, 60000);
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\laila\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

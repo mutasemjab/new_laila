@@ -1,11 +1,12 @@
-@extends('layouts.admin')
-@section('title')
-    {{ __('messages.Show') }} {{ __('messages.Customers') }}
-@endsection
+
+<?php $__env->startSection('title'); ?>
+    <?php echo e(__('messages.Show')); ?> <?php echo e(__('messages.Customers')); ?>
+
+<?php $__env->stopSection(); ?>
 
 
 
-@section('css')
+<?php $__env->startSection('css'); ?>
 <style>
     /* Normal view styling */
     .visitor-badge-container {
@@ -155,10 +156,10 @@
         }
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -166,7 +167,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h4>User Details</h4>
-                        <a href="{{ route('users.index') }}" class="btn btn-secondary">Back to Users</a>
+                        <a href="<?php echo e(route('users.index')); ?>" class="btn btn-secondary">Back to Users</a>
                     </div>
                 </div>
 
@@ -174,19 +175,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h5>User Information</h5>
-                            <p><strong>ID:</strong> {{ $user->id }}</p>
-                            <p><strong>Title:</strong> {{ $user->title }}</p>
-                            <p><strong>Name:</strong> {{ $user->name }} </p>
-                            <p><strong>Company:</strong> {{ $user->company }}</p>
-                            <p><strong>Country:</strong> {{ $user->country }}</p>
-                            <p><strong>Phone:</strong> {{ $user->phone }}</p>
-                            <p><strong>Email:</strong> {{ $user->email }}</p>
-                            <p><strong>Category: {!! $user->categoryLabel(false) !!}</strong></p>
-                            <p><strong>Created At:</strong> {{ $user->created_at->format('Y-m-d H:i:s') }}</p>
+                            <p><strong>ID:</strong> <?php echo e($user->id); ?></p>
+                            <p><strong>Title:</strong> <?php echo e($user->title); ?></p>
+                            <p><strong>Name:</strong> <?php echo e($user->name); ?> </p>
+                            <p><strong>Company:</strong> <?php echo e($user->company); ?></p>
+                            <p><strong>Country:</strong> <?php echo e($user->country); ?></p>
+                            <p><strong>Phone:</strong> <?php echo e($user->phone); ?></p>
+                            <p><strong>Email:</strong> <?php echo e($user->email); ?></p>
+                            <p><strong>Category: <?php echo $user->categoryLabel(false); ?></strong></p>
+                            <p><strong>Created At:</strong> <?php echo e($user->created_at->format('Y-m-d H:i:s')); ?></p>
 
                             <div class="mt-3">
-                                {{-- <a href="{{ route('attendance.user.logs', $user->id) }}" class="btn btn-info">View Attendance Logs</a> --}}
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Edit User</a>
+                                
+                                <a href="<?php echo e(route('users.edit', $user->id)); ?>" class="btn btn-primary">Edit User</a>
                             </div>
                         </div>
 
@@ -210,13 +211,13 @@
                 <div class="badge-header">
                     <div class="logos-container">
                         <div class="logo">
-                            <img src="{{ asset('assets/admin/imgs/logo2.jpeg') }}" alt="Logo 2" onerror="this.style.display='none'">
+                            <img src="<?php echo e(asset('assets/admin/imgs/logo2.jpeg')); ?>" alt="Logo 2" onerror="this.style.display='none'">
                         </div>
                         <div class="logo">
-                            <img src="{{ asset('assets/admin/imgs/logo1.jpeg') }}" alt="Logo 1" onerror="this.style.display='none'">
+                            <img src="<?php echo e(asset('assets/admin/imgs/logo1.jpeg')); ?>" alt="Logo 1" onerror="this.style.display='none'">
                         </div>
                         <div class="logo">
-                            <img src="{{ asset('assets/admin/imgs/logo3.jpeg') }}" alt="Logo 3" onerror="this.style.display='none'">
+                            <img src="<?php echo e(asset('assets/admin/imgs/logo3.jpeg')); ?>" alt="Logo 3" onerror="this.style.display='none'">
                         </div>
                     </div>
                 </div>
@@ -224,23 +225,23 @@
 
                 <div class="badge-body text-center">
                     <div class="attendee-name">
-                        <h3>{{ $user->name }}</h3>
-                    </div>
-                    <div class="attendee-name">
-                        <h3>{{ $user->position }}</h3>
+                        <h3><?php echo e($user->name); ?></h3>
                     </div>
                     <div class="attendee-country">
-                        <h5>{{ $user->country }}</h5>
+                        <h5><?php echo e($user->country); ?></h5>
                     </div>
-                  
-                    {!! $user->categoryLabel(false) !!}
-                    @if ($user->category == 3 || $user->category == 5 || $user->category == 6)
-                    @else
+                    <div class="attendee-country">
+                        <h5 style="padding-right: 130px;">Position : </h5>
+                    </div>
+                    <?php echo $user->categoryLabel(false); ?>
+
+                    <?php if($user->category == 3 || $user->category == 5 || $user->category == 6): ?>
+                    <?php else: ?>
                     <div class="badge-barcode text-center">
                         <svg id="barcode"></svg>
-                        <p class="barcode-text">{{ $user->barcode }}</p>
+                        <p class="barcode-text"><?php echo e($user->barcode); ?></p>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -249,15 +250,15 @@
 </div>
 
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@section('script')
+<?php $__env->startSection('script'); ?>
 <!-- Add this before your closing </body> tag -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        JsBarcode("#barcode", "{{ $user->barcode }}", {
+        JsBarcode("#barcode", "<?php echo e($user->barcode); ?>", {
             format: "CODE128",
             lineColor: "#000",
             width: 2,
@@ -266,4 +267,6 @@
         });
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/u167651649/domains/mutasemjaber.online/public_html/laila/resources/views/admin/users/show.blade.php ENDPATH**/ ?>

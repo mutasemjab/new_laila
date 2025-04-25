@@ -45,6 +45,16 @@
                             @enderror
                         </div>
                     </div>
+             
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('messages.position') }}</label>
+                            <input name="position" id="position" class="form-control" value="{{ old('position') }}">
+                            @error('position')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
 
                     <div class="col-md-6">
                         <div class="form-group">

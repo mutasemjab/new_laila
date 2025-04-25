@@ -75,19 +75,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['lo
         Route::view('/print_badge', 'print_badge')->name('admin.print.badge');
 
 
-        //Reports
-        Route::get('/inventory_report', [InventoryReportController::class, 'index'])->name('inventory_report');
-        Route::get('/order_report', [OrderReportController::class, 'index'])->name('order_report');
-        Route::get('/product_move', [ProductReportController::class, 'index'])->name('product_move');
-        Route::get('/tax_report', [TaxReportController::class, 'index'])->name('tax_report');
-
+        
         // Attendance routes
         Route::post('/scan-barcode', [AttendanceController::class, 'scanBarcode'])->name('scan.barcode');
         Route::post('/validate-barcode', [AttendanceController::class, 'validateBarcode'])->name('validate.barcode');
         Route::get('/room/statistics', [DashboardController::class, 'getStatistics'])
             ->name('room.statistics');
         Route::get('/initialize-room-occupancy', [AttendanceController::class, 'initializeRoomOccupancy'])->name('initialize.room.occupancy');
-        Route::get('user-time/{id}', [UserController::class, 'showLogs'])->name('user-time.show');
+        Route::get('user-time/{userId}', [UserController::class, 'showLogs'])->name('user-time.show');
 
         Route::get('/validate-barcode/{get_barcode?}', [AttendanceController::class, 'validateBarcode'])->name('validate.barcode');
         Route::get('/scan-barcode/{get_barcode?}/{get_room_id?}', [AttendanceController::class, 'scanBarcode'])->name('scan.barcode');
@@ -103,9 +98,9 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['lo
         ->name('room.get.users');
         Route::get('/room/{room_id}/{name?}', [AttendanceController::class,'room'])->name('room.attandance');
 
-        Route::get('/day-statics/{day_id?}', [DayController::class,'index'])->name('day.index');
-        Route::post('/day/get/users/{room_id?}/{day_id?}', [DayController::class, 'getDaysUsers'])
-        ->name('day.get.users');
+        Route::get('/admin/days/cumulative-time', [DayController::class, 'getCumulativeRoomTime'])
+        ->name('day.index');
+
         Route::get('day-open', [DayController::class,'Open'])->name('day.open');
         Route::get('day-close', [DayController::class,'Close'])->name('day.close');
 

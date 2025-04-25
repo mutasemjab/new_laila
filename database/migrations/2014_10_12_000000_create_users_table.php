@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('company');
             $table->string('country');
+            $table->string('position');
             $table->string('email')->nullable();
             $table->tinyInteger('gender')->default(1); // 1 male // 2 female
             $table->tinyInteger('category')->default(1); // 1 speaker // 2 participant // 3 Exhibitor // 4 committee // 5 press // 6 other

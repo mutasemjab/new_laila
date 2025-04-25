@@ -129,7 +129,7 @@ return [
     "room"=>"غرفة",
     "Committee"=>"لجنة",
     "Press"=>"صحافة",
-    "Other"=>"أُخري",
+    "Other"=>"أخرى",
     "Speaker"=>"متحدث",
     "Participant"=>"حضور",
     "Exhibitor"=>"عارض",

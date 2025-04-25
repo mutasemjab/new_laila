@@ -22,6 +22,7 @@ class UserFactory extends Factory
             'name'  => fake()->firstName($gender),
             'company'     => fake()->company(),
             'country'     => fake()->country(),
+            'position'     => fake()->jobTitle(),
             'email'       => fake()->safeEmail(),
             'gender'      => ($gender ? 2 : 1),
             'phone'       => fake()->phoneNumber(),

@@ -1,8 +1,9 @@
+{{-- this code when i filter the time in qualified --}}
 @if(isset($users) && $users->count())
 @foreach ($users as $user)
     <tr>
         <td>{{ $user->id }}</td>
-        <td>{{ $user->title .' '. $user->first_name }}</td>
+        <td>{{  $user->name }}</td>
         <td>{!! $user->categoryLabel(0) !!}</td>
         <!-- <td>{{ $user->email }}</td> -->
         <td>{{  $user->barcode }}</td>

@@ -469,15 +469,7 @@
                 <p id="active-rooms">{{ $activeRooms }}</p>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-                <h3>متوسط وقت الحضور</h3>
-                <p id="avg-time">{{ $avgTime }}</p>
-            </div>
-        </div>
+       
         <div class="stat-card">
             <div class="stat-icon purple">
                 <i class="fas fa-user-check"></i>
@@ -857,27 +849,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle Enter key press in input field
-    // barcodeInput.addEventListener('keypress', function(e) {
-    //     if (e.key === 'Enter') {
-    //         const barcode = this.value;
-    //         if (!barcode || barcode.trim() === '') {
-    //             scanStatus.className = 'scan-status error';
-    //             scanStatus.textContent = 'الرجاء إدخال باركود صحيح';
-    //             return;
-    //         }
+barcodeInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const barcode = this.value;
+        if (!barcode || barcode.trim() === '') {
+            scanStatus.className = 'scan-status error';
+            scanStatus.textContent = 'الرجاء إدخال باركود صحيح';
+            return;
+        }
 
-    //         // Validate barcode first then process if valid
-    //         validateBarcode(barcode).then(isValid => {
-    //             if (isValid) {
-    //                 processBarcode(barcode);
-    //             } else {
-    //                 // Clear input for next scan
-    //                 this.value = '';
-    //                 this.focus();
-    //             }
-    //         });
-    //     }
-    // });
+        processBarcode(barcode);
+    }
+});
 
     // Add refresh button event listener
     refreshStats.addEventListener('click', refreshAllStats);

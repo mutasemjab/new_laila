@@ -168,29 +168,29 @@
     </style>
 </head>
 <body>
-    @php
+    <?php
         $users = App\Models\User::get();
-    @endphp
+    ?>
     
     <div class="print-btn">
         <button onclick="window.print()">Print Badges</button>
     </div>
 
-    @foreach ($users->chunk(4) as $chunk)
+    <?php $__currentLoopData = $users->chunk(4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $chunk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div class="a4-page">
             <div class="badge-container">
-                @foreach ($chunk as $user)
+                <?php $__currentLoopData = $chunk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="visitor-badge">
                         <div class="badge-header">
                             <div class="logos-container">
                                 <div class="logo">
-                                    <img src="{{ asset('assets/admin/imgs/logo2.jpeg') }}" alt="Logo 2" onerror="this.style.display='none'">
+                                    <img src="<?php echo e(asset('assets/admin/imgs/logo2.jpeg')); ?>" alt="Logo 2" onerror="this.style.display='none'">
                                 </div>
                                 <div class="logo">
-                                    <img src="{{ asset('assets/admin/imgs/logo1.jpeg') }}" alt="Logo 1" onerror="this.style.display='none'">
+                                    <img src="<?php echo e(asset('assets/admin/imgs/logo1.jpeg')); ?>" alt="Logo 1" onerror="this.style.display='none'">
                                 </div>
                                 <div class="logo">
-                                    <img src="{{ asset('assets/admin/imgs/logo3.jpeg') }}" alt="Logo 3" onerror="this.style.display='none'">
+                                    <img src="<?php echo e(asset('assets/admin/imgs/logo3.jpeg')); ?>" alt="Logo 3" onerror="this.style.display='none'">
                                 </div>
                             </div>
                         </div>
@@ -199,52 +199,53 @@
                         <div class="badge-body">
                             <div>
                                 <div class="attendee-name">
-                                    <h3>{{ $user->name }}</h3>
+                                    <h3><?php echo e($user->name); ?></h3>
                                 </div>
                                 <div class="attendee-company">
-                                    <h3>{{ $user->position }}</h3>
+                                    <h3><?php echo e($user->position); ?></h3>
                                 </div>
                                 <div class="attendee-country">
-                                    <h5>{{ $user->country }}</h5>
+                                    <h5><?php echo e($user->country); ?></h5>
                                 </div>
                                
-                                {!! $user->categoryLabel(false) !!}
+                                <?php echo $user->categoryLabel(false); ?>
+
                             </div>
                             
                             <div>
-                                @if ($user->category != 3 && $user->category != 5 && $user->category != 6)
+                                <?php if($user->category != 3 && $user->category != 5 && $user->category != 6): ?>
                                 <div class="badge-barcode">
-                                    <svg id="barcode-{{ $user->id }}"></svg>
-                                    <p class="barcode-text">{{ $user->barcode }}</p>
+                                    <svg id="barcode-<?php echo e($user->id); ?>"></svg>
+                                    <p class="barcode-text"><?php echo e($user->barcode); ?></p>
                                 </div>
-                                @else
+                                <?php else: ?>
                                 <div class="badge-barcode">
                                     <p> Thank you for attending the conference.</p>
                                 </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            @foreach ($users as $user)
-                @if ($user->category != 3 && $user->category != 5 && $user->category != 6)
-                    JsBarcode("#barcode-{{ $user->id }}", "{{ $user->barcode }}", {
+            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($user->category != 3 && $user->category != 5 && $user->category != 6): ?>
+                    JsBarcode("#barcode-<?php echo e($user->id); ?>", "<?php echo e($user->barcode); ?>", {
                         format: "CODE128",
                         lineColor: "#000",
                         width: 2,
                         height: 60,
                         displayValue: false
                     });
-                @endif
-            @endforeach
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         });
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\xampp\htdocs\laila\resources\views/print_badge.blade.php ENDPATH**/ ?>

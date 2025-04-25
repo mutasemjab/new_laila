@@ -49,6 +49,27 @@
                 </div>
 
                 <div class="card-body">
+                    <!-- Category Filter Form -->
+                    <form action="{{ route('users.index') }}" method="GET" class="mb-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label for="category" class="form-label">Filter by Category</label>
+                                <select name="category" id="category" class="form-control">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $key => $value)
+                                        <option value="{{ $key }}" {{ request('category') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary w-100">Reset</a>
+                            </div>
+                        </div>
+                    </form>
+
                     @if(isset($users) && $users->count())
                     <table class="table">
                         <thead>
@@ -73,13 +94,18 @@
                                         <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm btn-info">View</a>
                                         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('user-time.show', $user->id) }}" class="btn btn-sm btn-secondary">Attendance</a>
-                                    
+                                        <form method="POST" action="{{ route('certificate.download') }}">
+                                            @csrf
+                                            <input type="text" name="name" value="{{ $user->name }}" hidden>
+                                            <input type="text" name="id" value="{{ $user->id }}" hidden>
+                                            <button type="submit">Give the Certificate</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    {{ $users->links() }}
+                    
                     @endif
                 </div>
             </div>
